@@ -180,7 +180,7 @@ GameEngine::GameEngine() {
 
     this->context->Init(archiveFiles, {}, 3, { 26800, 512, 1100 }, wnd, controlDeck);
 
-#ifndef __SWITCH__
+#if !defined(__SWITCH__) && 0
     Ship::Context::GetInstance()->GetLogger()->set_level(
         (spdlog::level::level_enum) CVarGetInteger("gDeveloperTools.LogLevel", 1));
     Ship::Context::GetInstance()->GetLogger()->set_pattern("[%H:%M:%S.%e] [%s:%#] [%l] %v");
@@ -346,9 +346,7 @@ void GameEngine::Create() {
     const auto instance = Instance = new GameEngine();
     instance->AudioInit();
     GameUI::SetupGuiElements();
-#if defined(__SWITCH__) || defined(__WIIU__)
-    CVarRegisterInteger("gControlNav", 1); // always enable controller nav on switch/wii u
-#endif
+    CVarRegisterInteger("gControlNav", 1); // always enable controller nav
 }
 
 void GameEngine::Destroy() {

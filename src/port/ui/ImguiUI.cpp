@@ -459,6 +459,8 @@ void DrawMenuBarIcon() {
 }
 
 void DrawGameMenu() {
+    ImGuiIO& io = ImGui::GetIO();
+    io.FontGlobalScale = 3.0f;
 }
 
 void DrawEnhancementsMenu() {

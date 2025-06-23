@@ -48,11 +48,18 @@ add_compile_definitions(YAML_CPP_STATIC_DEFINE)
 include(cmake/lus-cvars.cmake)
 
 if (WIN32)
+FetchContent_Declare(UwpLibs
+	GIT_REPOSITORY https://github.com/worleydl/uwp-dep.git
+	GIT_TAG 6bacc41c906298d8e667fdc20590fa70b1d92ffa
+)
+FetchContent_MakeAvailable(UwpLibs)
+
+# Use vcpkg for everything else 
 include(cmake/automate-vcpkg.cmake)
 set(VCPKG_TRIPLET x64-windows-static)
 set(VCPKG_TARGET_TRIPLET x64-windows-static)
 vcpkg_bootstrap()
-vcpkg_install_packages(zlib bzip2 libzip libpng sdl2 sdl2-net glew glfw3 nlohmann-json tinyxml2 spdlog libogg libvorbis)
+vcpkg_install_packages(zlib bzip2 libzip libpng sdl2-net glew nlohmann-json tinyxml2 spdlog libogg libvorbis)
 
 set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
@@ -239,7 +246,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL "iOS")
         RESOURCE "${IMAGE_FILES};${STORYBOARD_FILE};${ICON_FILES}"
     )
 else()
-    add_executable(${PROJECT_NAME} ${ALL_FILES})
+    # [UWP] Modded to be a DLL to be launched from minimal wrapper
+    add_library(${PROJECT_NAME} SHARED ${ALL_FILES})
 endif()
 
 ################################################################################
@@ -328,7 +336,8 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/libultraship/libultraship/Lib/spdlog/include/
   ${CMAKE_CURRENT_SOURCE_DIR}/libultraship/src/graphic/Fast3D/U64/PR
   ${CMAKE_CURRENT_SOURCE_DIR}/libultraship/src/graphic
-  ${SDL2_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_SOURCE_DIR}/uwp-dep/include/SDL2/
+  #${SDL2_INCLUDE_DIRS}
   ${GLEW_INCLUDE_DIRS}
   ${dr_libs_SOURCE_DIR}
 )
@@ -450,7 +459,7 @@ option(BUILD_SF64 "Build with Star Fox 64 support" OFF)
 option(BUILD_FZERO "Build with F-Zero X support" OFF)
 
 add_subdirectory(torch)
-target_link_libraries(${PROJECT_NAME} PRIVATE torch "${ADDITIONAL_LIBRARY_DEPENDENCIES}")
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL2 LIBUWP GLFW3 torch "${ADDITIONAL_LIBRARY_DEPENDENCIES}")
 
 if(CMAKE_SYSTEM_NAME MATCHES "NintendoSwitch")
 

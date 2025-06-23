@@ -1,3 +1,5 @@
+#define SDLMAIN_DECLSPEC __declspec(dllexport)
+
 #include <libultraship.h>
 
 #include "Game.h"
